@@ -1,7 +1,7 @@
-"""Book title extractor using chatjimmy API + Open Library pipeline.
+"""Music artist extractor using chatjimmy API + TheAudioDB pipeline.
 
-Uses the free chatjimmy.ai API to extract book titles from raw text,
-then fetches search results for each title from Open Library.
+Uses the free chatjimmy.ai API to extract artist names from raw text,
+then fetches search results for each artist from TheAudioDB.
 """
 
 import gzip
@@ -11,7 +11,7 @@ import sys
 import urllib.error
 import urllib.request
 
-from openlibrary import SearchResult, search_books
+from audiodb import ArtistSearchResult, search_artist
 
 
 API_URL = "https://chatjimmy.ai/api/chat"
@@ -34,12 +34,12 @@ HEADERS = {
 STATS_RE = re.compile(r"<\|stats\|>.*?<\|/stats\|>", re.DOTALL)
 
 _PROMPT_TEMPLATE = """\
-Extract all book titles mentioned in the following text.
-Return ONLY a valid JSON array of book title strings, with no additional commentary or explanation.
-If no book titles are mentioned, return an empty JSON array: []
+Extract all music artist names mentioned in the following text.
+Return ONLY a valid JSON array of artist name strings, with no additional commentary or explanation.
+If no artist names are mentioned, return an empty JSON array: []
 
 Example format:
-["The Great Gatsby", "1984", "To Kill a Mockingbird"]
+["Coldplay", "Radiohead", "Daft Punk"]
 
 Text: {text}"""
 
@@ -106,14 +106,14 @@ def _parse_response(raw: str) -> str:
     return STATS_RE.sub("", text).strip()
 
 
-def extract_book_titles(text: str) -> list[str]:
-    """Extract book titles from raw text using chatjimmy API.
+def extract_artist_names(text: str) -> list[str]:
+    """Extract artist names from raw text using chatjimmy API.
 
     Args:
-        text: Raw text that may contain book title mentions.
+        text: Raw text that may contain artist name mentions.
 
     Returns:
-        List of book title strings found in the text.
+        List of artist name strings found in the text.
 
     Raises:
         json.JSONDecodeError: If the model output is not valid JSON.
@@ -136,33 +136,33 @@ def extract_book_titles(text: str) -> list[str]:
         return []
 
     # Parse JSON array
-    titles = json.loads(clean)
+    names = json.loads(clean)
 
     # Ensure it's a list and all items are strings
-    if not isinstance(titles, list):
-        raise ValueError(f"Expected JSON array, got {type(titles)}")
+    if not isinstance(names, list):
+        raise ValueError(f"Expected JSON array, got {type(names)}")
 
-    return [str(title).strip() for title in titles if title]
+    return [str(name).strip() for name in names if name]
 
 
-def get_recommendations_for_text(text: str) -> dict[str, SearchResult]:
-    """Extract book titles from text and fetch Open Library results for each.
+def get_recommendations_for_text(text: str) -> dict[str, ArtistSearchResult]:
+    """Extract artist names from text and fetch TheAudioDB results for each.
 
     Args:
-        text: Raw text that may contain book title mentions.
+        text: Raw text that may contain artist name mentions.
 
     Returns:
-        Dict mapping each extracted book title to its Open Library SearchResult.
-        Titles with no results are included with an empty SearchResult.
+        Dict mapping each extracted artist name to its TheAudioDB ArtistSearchResult.
+        Artists with no results are included with an empty ArtistSearchResult.
 
     Raises:
         json.JSONDecodeError: If the model output is not valid JSON.
         RuntimeError: If the API call fails.
     """
-    titles = extract_book_titles(text)
+    names = extract_artist_names(text)
 
-    results: dict[str, SearchResult] = {}
-    for title in titles:
-        results[title] = search_books(title)
+    results: dict[str, ArtistSearchResult] = {}
+    for name in names:
+        results[name] = search_artist(name)
 
     return results

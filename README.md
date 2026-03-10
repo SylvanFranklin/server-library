@@ -4,6 +4,8 @@
 - [ ] SSG based on the contents of the database
 - [ ] Github action that auto deploys the new website
 - [ ] Mulitple APIS for music and movies etc. 
+- [ ] Nmemos potentially follows. 
+
 
 <!---->
 <!---->
