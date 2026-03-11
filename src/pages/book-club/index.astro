@@ -1,0 +1,57 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SearchableShelf from "../../components/SearchableShelf.svelte";
+
+const books = [
+  {
+    title: "The Left Hand of Darkness",
+    subtitle: "First discussion pick",
+    meta: "Book Club note",
+    href: "#",
+    placeholderLabel: "Book Club",
+    kindLabel: "Book Club"
+  },
+  {
+    title: "Pale Fire",
+    subtitle: "Suggested reread",
+    meta: "Book Club note",
+    href: "#",
+    placeholderLabel: "Book Club",
+    kindLabel: "Book Club"
+  },
+  {
+    title: "A Month in the Country",
+    subtitle: "Shortlist candidate",
+    meta: "Book Club note",
+    href: "#",
+    placeholderLabel: "Book Club",
+    kindLabel: "Book Club"
+  }
+];
+---
+
+<BaseLayout title="Book Club | Server Library">
+  <section class="user-heading">
+    <p><a href="/">Back to index</a></p>
+    <h2>Book Club</h2>
+    <p class="meta">A shelf for shared reads, shortlist ideas, and discussion picks.</p>
+  </section>
+
+  <section class="essay-callout">
+    <div>
+      <p>
+        We'll pick a book every month and discuss it together. 
+      </p>
+    </div>
+  </section>
+
+  <section class="category">
+    <SearchableShelf
+      client:load
+      items={books}
+      placeholder="Search Book Club"
+      searchLabel="Search book club"
+      emptyMessage="No book club picks added yet."
+    />
+  </section>
+</BaseLayout>

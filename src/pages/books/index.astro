@@ -1,0 +1,37 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SearchableShelf from "../../components/SearchableShelf.svelte";
+import library from "../../data/library.js";
+
+const books = library.users.flatMap((user) =>
+  user.books.map((book) => ({
+    title: book.title,
+    subtitle: [book.author ? `by ${book.author}` : null, book.year ? `(${book.year})` : null].filter(Boolean).join(" "),
+    imageUrl: book.cover_url,
+    imageAlt: `Cover of ${book.title}`,
+    meta: `Saved by ${user.username} on ${book.added_at}`,
+    username: user.username,
+    href: `/users/${user.username}/`,
+    placeholderLabel: "No cover",
+    kindLabel: "Book"
+  }))
+);
+---
+
+<BaseLayout title="Books | Server Library">
+  <section class="user-heading">
+    <p><a href="/">Back to index</a></p>
+    <h2>Books</h2>
+    <p class="meta">{books.length} books in this snapshot</p>
+  </section>
+
+  <section class="category">
+    <SearchableShelf
+      client:load
+      items={books}
+      placeholder="Search books by title or author"
+      searchLabel="Search books"
+      emptyMessage="No books saved."
+    />
+  </section>
+</BaseLayout>

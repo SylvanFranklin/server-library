@@ -22,15 +22,27 @@ const { user } = Astro.props;
   </section>
 
   <section class="category">
-    <h3>Books</h3>
+    <h3><a href="/books/">Books</a></h3>
     {user.books.length ? (
       <ul class="media-list">
         {user.books.map((book) => (
-          <li>
-            <strong>{book.title}</strong>
-            {book.author && <span> by {book.author}</span>}
-            {book.year && <span> ({book.year})</span>}
-            <div class="meta">Saved {book.added_at}</div>
+          <li class="media-card">
+            {book.cover_url ? (
+              <img
+                class="media-art"
+                src={book.cover_url}
+                alt={`Cover of ${book.title}`}
+                loading="lazy"
+              />
+            ) : (
+              <div class="media-art media-art-placeholder" aria-hidden="true">No cover</div>
+            )}
+            <div>
+              <strong>{book.title}</strong>
+              {book.author && <span> by {book.author}</span>}
+              {book.year && <span> ({book.year})</span>}
+              <div class="meta">Saved {book.added_at}</div>
+            </div>
           </li>
         ))}
       </ul>
@@ -40,15 +52,29 @@ const { user } = Astro.props;
   </section>
 
   <section class="category">
-    <h3>Music</h3>
+    <h3><a href="/music/">Music</a></h3>
     {user.music.length ? (
       <ul class="media-list">
         {user.music.map((artist) => (
-          <li>
-            <strong>{artist.name}</strong>
-            {artist.genre && <span> - {artist.genre}</span>}
-            {artist.country && <span> ({artist.country})</span>}
-            <div class="meta">Saved {artist.added_at}</div>
+          <li class="media-card">
+            {artist.image_url ? (
+              <img
+                class="media-art media-art-wide"
+                src={artist.image_url}
+                alt={`Artist image for ${artist.name}`}
+                loading="lazy"
+              />
+            ) : (
+              <div class="media-art media-art-wide media-art-placeholder" aria-hidden="true">
+                No image
+              </div>
+            )}
+            <div>
+              <strong>{artist.name}</strong>
+              {artist.genre && <span> - {artist.genre}</span>}
+              {artist.country && <span> ({artist.country})</span>}
+              <div class="meta">Saved {artist.added_at}</div>
+            </div>
           </li>
         ))}
       </ul>
@@ -58,14 +84,30 @@ const { user } = Astro.props;
   </section>
 
   <section class="category">
-    <h3>Movies</h3>
+    <h3><a href="/movies/">Movies</a></h3>
     {user.movies.length ? (
       <ul class="media-list">
         {user.movies.map((movie) => (
-          <li>
-            <strong>{movie.title}</strong>
-            {movie.year && <span> ({movie.year})</span>}
-            <div class="meta">Saved {movie.added_at}</div>
+          <li class="media-card">
+            {movie.poster_url && !movie.poster_url.startsWith("data:image/svg+xml") ? (
+              <img
+                class="media-art"
+                src={movie.poster_url}
+                alt={`Poster for ${movie.title}`}
+                loading="lazy"
+              />
+            ) : (
+              <div class="media-art poster-fallback">
+                <span class="poster-label">Movie Poster</span>
+                <strong>{movie.title}</strong>
+                {movie.year && <span>({movie.year})</span>}
+              </div>
+            )}
+            <div>
+              <strong>{movie.title}</strong>
+              {movie.year && <span> ({movie.year})</span>}
+              <div class="meta">Saved {movie.added_at}</div>
+            </div>
           </li>
         ))}
       </ul>

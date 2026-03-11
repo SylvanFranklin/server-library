@@ -1,0 +1,38 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SearchableShelf from "../../components/SearchableShelf.svelte";
+import library from "../../data/library.js";
+
+const movies = library.users.flatMap((user) =>
+  user.movies.map((movie) => ({
+    title: movie.title,
+    subtitle: movie.year ? `(${movie.year})` : "",
+    imageUrl: movie.poster_url,
+    imageAlt: `Poster for ${movie.title}`,
+    meta: `Saved by ${user.username} on ${movie.added_at}`,
+    username: user.username,
+    href: `/users/${user.username}/`,
+    isPosterFallback: true,
+    posterText: movie.year ? `(${movie.year})` : "",
+    kindLabel: "Movie"
+  }))
+);
+---
+
+<BaseLayout title="Movies | Server Library">
+  <section class="user-heading">
+    <p><a href="/">Back to index</a></p>
+    <h2>Movies</h2>
+    <p class="meta">{movies.length} movies in this snapshot</p>
+  </section>
+
+  <section class="category">
+    <SearchableShelf
+      client:load
+      items={movies}
+      placeholder="Search movies by title or year"
+      searchLabel="Search movies"
+      emptyMessage="No movies saved."
+    />
+  </section>
+</BaseLayout>
