@@ -1,0 +1,29 @@
+---
+const { title = "Server Library", description = "Static library generated from SQLite." } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="stylesheet" href="/styles/site.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="site-header">
+        <p class="eyebrow">server-library</p>
+        <h1><a href="/">The Library</a></h1>
+        <p class="tagline">Static pages generated from the SQLite database.</p>
+      </header>
+      <main>
+        <slot />
+      </main>
+      <footer class="site-footer">
+        <p>Built from <code>library.db</code>.</p>
+      </footer>
+    </div>
+  </body>
+</html>

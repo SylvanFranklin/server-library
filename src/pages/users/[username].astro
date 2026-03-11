@@ -1,0 +1,76 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import library from "../../data/library.js";
+
+export function getStaticPaths() {
+  return library.users.map((user) => ({
+    params: { username: user.username },
+    props: { user }
+  }));
+}
+
+const { user } = Astro.props;
+---
+
+<BaseLayout title={`${user.username} | Server Library`}>
+  <section class="user-heading">
+    <p><a href="/">Back to index</a></p>
+    <h2>{user.username}</h2>
+    <p class="meta">
+      {user.counts.books} books, {user.counts.music} artists, {user.counts.movies} movies
+    </p>
+  </section>
+
+  <section class="category">
+    <h3>Books</h3>
+    {user.books.length ? (
+      <ul class="media-list">
+        {user.books.map((book) => (
+          <li>
+            <strong>{book.title}</strong>
+            {book.author && <span> by {book.author}</span>}
+            {book.year && <span> ({book.year})</span>}
+            <div class="meta">Saved {book.added_at}</div>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>No books saved.</p>
+    )}
+  </section>
+
+  <section class="category">
+    <h3>Music</h3>
+    {user.music.length ? (
+      <ul class="media-list">
+        {user.music.map((artist) => (
+          <li>
+            <strong>{artist.name}</strong>
+            {artist.genre && <span> - {artist.genre}</span>}
+            {artist.country && <span> ({artist.country})</span>}
+            <div class="meta">Saved {artist.added_at}</div>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>No artists saved.</p>
+    )}
+  </section>
+
+  <section class="category">
+    <h3>Movies</h3>
+    {user.movies.length ? (
+      <ul class="media-list">
+        {user.movies.map((movie) => (
+          <li>
+            <strong>{movie.title}</strong>
+            {movie.year && <span> ({movie.year})</span>}
+            <div class="meta">Saved {movie.added_at}</div>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>No movies saved.</p>
+    )}
+  </section>
+</BaseLayout>

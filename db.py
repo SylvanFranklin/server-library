@@ -26,6 +26,16 @@ class UserMovie:
     movie: Movie
     added_at: str
 
+
+@dataclass
+class UserSummary:
+    username: str
+    created_at: str
+    book_count: int
+    artist_count: int
+    movie_count: int
+
+
 DB_PATH = Path(__file__).parent / "library.db"
 
 
@@ -275,6 +285,36 @@ def get_user_movies(conn: sqlite3.Connection, username: str) -> list[UserMovie]:
                 poster_url=row["poster_url"],
             ),
             added_at=row["added_at"],
+        )
+        for row in rows
+    ]
+
+
+def get_all_user_summaries(conn: sqlite3.Connection) -> list[UserSummary]:
+    rows = conn.execute(
+        """
+        SELECT
+            u.discord_username,
+            u.created_at,
+            COUNT(DISTINCT ub.rowid) AS book_count,
+            COUNT(DISTINCT ua.rowid) AS artist_count,
+            COUNT(DISTINCT um.rowid) AS movie_count
+        FROM users u
+        LEFT JOIN user_books ub ON u.id = ub.user_id
+        LEFT JOIN user_artists ua ON u.id = ua.user_id
+        LEFT JOIN user_movies um ON u.id = um.user_id
+        GROUP BY u.id, u.discord_username, u.created_at
+        ORDER BY LOWER(u.discord_username)
+        """
+    ).fetchall()
+
+    return [
+        UserSummary(
+            username=row["discord_username"],
+            created_at=row["created_at"],
+            book_count=row["book_count"],
+            artist_count=row["artist_count"],
+            movie_count=row["movie_count"],
         )
         for row in rows
     ]

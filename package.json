@@ -1,0 +1,14 @@
+{
+  "name": "server-library-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:data": "uv run python export_site_data.py",
+    "build": "npm run build:data && astro build",
+    "dev": "npm run build:data && astro dev",
+    "preview": "astro preview"
+  },
+  "devDependencies": {
+    "astro": "^5.13.5"
+  }
+}

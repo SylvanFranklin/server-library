@@ -1,0 +1,59 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import library from "../data/library.js";
+
+const users = library.users;
+---
+
+<BaseLayout title="Server Library">
+  <section class="intro">
+    <h2>Catalog Overview</h2>
+    <p>
+      This site is a static snapshot of the shared media database. Each user page lists saved
+      books, artists, and movies with the timestamps recorded in SQLite.
+    </p>
+  </section>
+
+  <section class="stats-grid">
+    <article>
+      <h3>Users</h3>
+      <p>{library.totals.users}</p>
+    </article>
+    <article>
+      <h3>Books</h3>
+      <p>{library.totals.books}</p>
+    </article>
+    <article>
+      <h3>Music</h3>
+      <p>{library.totals.music}</p>
+    </article>
+    <article>
+      <h3>Movies</h3>
+      <p>{library.totals.movies}</p>
+    </article>
+  </section>
+
+  <section>
+    <h2>Users</h2>
+    {users.length ? (
+      <ul class="user-list">
+        {users.map((user) => (
+          <li>
+            <h3><a href={`/users/${user.username}/`}>{user.username}</a></h3>
+            <p>
+              {user.counts.books} books, {user.counts.music} artists, {user.counts.movies} movies
+            </p>
+            <p class="meta">Added to library on {user.created_at}</p>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>No users are stored in the database yet.</p>
+    )}
+  </section>
+
+  <section class="meta-block">
+    <h2>Build Info</h2>
+    <p>Generated at {library.generated_at}</p>
+  </section>
+</BaseLayout>

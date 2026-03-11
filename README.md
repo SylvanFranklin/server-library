@@ -42,6 +42,25 @@ OMDB requires an API key (free at https://www.omdbapi.com/apikey.aspx):
 export OMDB_API_KEY=your_key_here
 ```
 
+## Static site
+
+The repo now includes an Astro-based static site that reads from `library.db` at build time.
+
+```bash
+# Install Astro dependencies
+npm install
+
+# Export SQLite data to JSON and build the site
+npm run build
+```
+
+Generated files are written to `dist/`.
+
+The build pipeline is:
+
+1. `uv run python export_site_data.py`
+2. `astro build`
+
 ## Connecting to nmemos
 
 nmemos needs to call into this library in two places:
@@ -86,6 +105,6 @@ The `connect()` call will use `library.db` in the project root by default. Pass 
 - [x] Music extraction + TheAudioDB API
 - [x] Movie extraction + OMDB API
 - [x] SQLite database with per-user history
-- [ ] SSG to generate a static website from the database
+- [x] SSG to generate a static website from the database
 - [ ] GitHub Action to auto-deploy the website
 - [ ] nmemos `/library` command integration
