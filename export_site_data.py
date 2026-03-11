@@ -6,15 +6,22 @@ from datetime import datetime
 import json
 from pathlib import Path
 
-from db import connect, get_all_user_summaries, get_user_artists, get_user_books, get_user_movies
+from db import connect, get_all_user_summaries, get_user_artists, get_user_books, get_user_movies, init_db
 
 
 ROOT = Path(__file__).parent
 OUTPUT_PATH = ROOT / "site-data" / "library.json"
 
 
+def build_book_cover_url(cover_id: int | None) -> str | None:
+    if not cover_id:
+        return None
+    return f"https://covers.openlibrary.org/b/id/{cover_id}-M.jpg"
+
+
 def build_payload() -> dict:
     conn = connect()
+    init_db(conn)
 
     users = []
     for summary in get_all_user_summaries(conn):
@@ -36,6 +43,7 @@ def build_payload() -> dict:
                         "title": entry.book.title,
                         "author": entry.book.author_name[0] if entry.book.author_name else None,
                         "year": entry.book.first_publish_year,
+                        "cover_url": build_book_cover_url(entry.book.cover_i),
                         "added_at": entry.added_at,
                     }
                     for entry in books
@@ -45,6 +53,7 @@ def build_payload() -> dict:
                         "name": entry.artist.name,
                         "genre": entry.artist.genre,
                         "country": entry.artist.country,
+                        "image_url": entry.artist.fanart_url,
                         "added_at": entry.added_at,
                     }
                     for entry in artists
@@ -53,6 +62,7 @@ def build_payload() -> dict:
                     {
                         "title": entry.movie.title,
                         "year": entry.movie.year,
+                        "poster_url": entry.movie.poster_url,
                         "added_at": entry.added_at,
                     }
                     for entry in movies

@@ -1,51 +1,81 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import SearchableShelf from "../components/SearchableShelf.svelte";
 import library from "../data/library.js";
 
-const users = library.users;
+const newStuff = library.users
+  .flatMap((user) => [
+    ...user.books.map((book) => ({
+      title: book.title,
+      subtitle: [book.author, book.year ? `(${book.year})` : null].filter(Boolean).join(" "),
+      imageUrl: book.cover_url,
+      imageAlt: `Cover of ${book.title}`,
+      addedAt: book.added_at,
+      username: user.username,
+      meta: `Added by ${user.username} on ${book.added_at}`,
+      href: `/users/${user.username}/`,
+      placeholderLabel: "No cover",
+      kindLabel: "Book"
+    })),
+    ...user.music.map((artist) => ({
+      title: artist.name,
+      subtitle: [artist.genre, artist.country ? `(${artist.country})` : null].filter(Boolean).join(" "),
+      imageUrl: artist.image_url,
+      imageAlt: `Artist image for ${artist.name}`,
+      wide: true,
+      addedAt: artist.added_at,
+      username: user.username,
+      meta: `Added by ${user.username} on ${artist.added_at}`,
+      href: `/users/${user.username}/`,
+      placeholderLabel: "No image",
+      kindLabel: "Music"
+    })),
+    ...user.movies.map((movie) => ({
+      title: movie.title,
+      subtitle: movie.year ? `(${movie.year})` : "",
+      imageUrl: movie.poster_url,
+      imageAlt: `Poster for ${movie.title}`,
+      isPosterFallback: true,
+      posterText: movie.year ? `(${movie.year})` : "",
+      addedAt: movie.added_at,
+      username: user.username,
+      meta: `Added by ${user.username} on ${movie.added_at}`,
+      href: `/users/${user.username}/`,
+      kindLabel: "Movie"
+    }))
+  ])
+  .sort((a, b) => b.addedAt.localeCompare(a.addedAt));
 ---
 
 <BaseLayout title="Server Library">
   <section class="stats-grid">
     <article>
-      <h3>Users</h3>
+      <h3><a href="/users/">Users</a></h3>
       <p>{library.totals.users}</p>
     </article>
     <article>
-      <h3>Books</h3>
+      <h3><a href="/books/">Books</a></h3>
       <p>{library.totals.books}</p>
     </article>
     <article>
-      <h3>Music</h3>
+      <h3><a href="/music/">Music</a></h3>
       <p>{library.totals.music}</p>
     </article>
     <article>
-      <h3>Movies</h3>
+      <h3><a href="/movies/">Movies</a></h3>
       <p>{library.totals.movies}</p>
     </article>
   </section>
 
-  <section>
-    <h2>Users</h2>
-    {users.length ? (
-      <ul class="user-list">
-        {users.map((user) => (
-          <li>
-            <h3><a href={`/users/${user.username}/`}>{user.username}</a></h3>
-            <p>
-              {user.counts.books} books, {user.counts.music} artists, {user.counts.movies} movies
-            </p>
-            <p class="meta">Added to library on {user.created_at}</p>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p>No users are stored in the database yet.</p>
-    )}
+  <section class="category">
+    <h2>New stuff</h2>
+    <SearchableShelf
+      client:load
+      items={newStuff}
+      placeholder="Search recent additions"
+      searchLabel="Search new stuff"
+      emptyMessage="No saved items are stored in the database yet."
+    />
   </section>
 
-  <section class="meta-block">
-    <h2>Build Info</h2>
-    <p>Generated at {library.generated_at}</p>
-  </section>
 </BaseLayout>

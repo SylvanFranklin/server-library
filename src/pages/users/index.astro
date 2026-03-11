@@ -1,0 +1,33 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SearchableShelf from "../../components/SearchableShelf.svelte";
+import library from "../../data/library.js";
+
+const users = library.users.map((user) => ({
+  title: user.username,
+  subtitle: `${user.counts.books} books, ${user.counts.music} artists, ${user.counts.movies} movies`,
+  meta: `Added to library on ${user.created_at}`,
+  href: `/users/${user.username}/`,
+  placeholderLabel: "User",
+  kindLabel: "User",
+  username: user.username
+}));
+---
+
+<BaseLayout title="Users | Server Library">
+  <section class="user-heading">
+    <p><a href="/">Back to index</a></p>
+    <h2>Users</h2>
+    <p class="meta">{library.totals.users} users in this snapshot</p>
+  </section>
+
+  <section class="category">
+    <SearchableShelf
+      client:load
+      items={users}
+      placeholder="Search users"
+      searchLabel="Search users"
+      emptyMessage="No users are stored in the database yet."
+    />
+  </section>
+</BaseLayout>

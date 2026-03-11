@@ -68,7 +68,8 @@ def init_db(conn: sqlite3.Connection) -> None:
             audiodb_id TEXT    UNIQUE,
             name       TEXT,
             genre      TEXT,
-            country    TEXT
+            country    TEXT,
+            fanart_url TEXT
         );
 
         CREATE TABLE IF NOT EXISTS user_books (
@@ -100,6 +101,11 @@ def init_db(conn: sqlite3.Connection) -> None:
             PRIMARY KEY (user_id, movie_id, added_at)
         );
     """)
+    artist_columns = {
+        row["name"] for row in conn.execute("PRAGMA table_info(artists)").fetchall()
+    }
+    if "fanart_url" not in artist_columns:
+        conn.execute("ALTER TABLE artists ADD COLUMN fanart_url TEXT")
     conn.commit()
 
 
@@ -140,15 +146,17 @@ def upsert_book(conn: sqlite3.Connection, book: Book) -> int:
 def upsert_artist(conn: sqlite3.Connection, artist: Artist) -> int:
     conn.execute(
         """
-        INSERT INTO artists (audiodb_id, name, genre, country)
-        VALUES (:audiodb_id, :name, :genre, :country)
+        INSERT INTO artists (audiodb_id, name, genre, country, fanart_url)
+        VALUES (:audiodb_id, :name, :genre, :country, :fanart_url)
         ON CONFLICT (audiodb_id) DO UPDATE SET
-            name    = excluded.name,
-            genre   = excluded.genre,
-            country = excluded.country
+            name       = excluded.name,
+            genre      = excluded.genre,
+            country    = excluded.country,
+            fanart_url = excluded.fanart_url
         """,
         {"audiodb_id": artist.id, "name": artist.name,
-         "genre": artist.genre, "country": artist.country},
+         "genre": artist.genre, "country": artist.country,
+         "fanart_url": artist.fanart_url},
     )
     conn.commit()
     row = conn.execute(
@@ -235,7 +243,7 @@ def get_user_books(conn: sqlite3.Connection, username: str) -> list[UserBook]:
 def get_user_artists(conn: sqlite3.Connection, username: str) -> list[UserArtist]:
     rows = conn.execute(
         """
-        SELECT a.audiodb_id, a.name, a.genre, a.country,
+        SELECT a.audiodb_id, a.name, a.genre, a.country, a.fanart_url,
                ua.added_at
         FROM artists a
         JOIN user_artists ua ON a.id = ua.artist_id
@@ -254,7 +262,7 @@ def get_user_artists(conn: sqlite3.Connection, username: str) -> list[UserArtist
                 genre=row["genre"],
                 biography=None,
                 country=row["country"],
-                fanart_url=None,
+                fanart_url=row["fanart_url"],
             ),
             added_at=row["added_at"],
         )

@@ -1,0 +1,38 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SearchableShelf from "../../components/SearchableShelf.svelte";
+import library from "../../data/library.js";
+
+const artists = library.users.flatMap((user) =>
+  user.music.map((artist) => ({
+    title: artist.name,
+    subtitle: [artist.genre, artist.country ? `(${artist.country})` : null].filter(Boolean).join(" "),
+    imageUrl: artist.image_url,
+    imageAlt: `Artist image for ${artist.name}`,
+    meta: `Saved by ${user.username} on ${artist.added_at}`,
+    username: user.username,
+    href: `/users/${user.username}/`,
+    wide: true,
+    placeholderLabel: "No image",
+    kindLabel: "Music"
+  }))
+);
+---
+
+<BaseLayout title="Music | Server Library">
+  <section class="user-heading">
+    <p><a href="/">Back to index</a></p>
+    <h2>Music</h2>
+    <p class="meta">{artists.length} artists in this snapshot</p>
+  </section>
+
+  <section class="category">
+    <SearchableShelf
+      client:load
+      items={artists}
+      placeholder="Search artists or genres"
+      searchLabel="Search music"
+      emptyMessage="No artists saved."
+    />
+  </section>
+</BaseLayout>

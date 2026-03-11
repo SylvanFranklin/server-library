@@ -9,6 +9,14 @@ const { title = "Server Library", description = "Static library generated from S
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <script is:inline>
+      const storedTheme = localStorage.getItem("theme-preference");
+      if (storedTheme === "light" || storedTheme === "dark") {
+        document.documentElement.dataset.theme = storedTheme;
+      } else {
+        document.documentElement.dataset.theme = "auto";
+      }
+    </script>
     <link rel="stylesheet" href="/styles/site.css" />
   </head>
   <body>
@@ -16,13 +24,57 @@ const { title = "Server Library", description = "Static library generated from S
       <header class="site-header">
         <p class="eyebrow">server-library</p>
         <h1><a href="/">The Library</a></h1>
+        <nav class="site-nav" aria-label="Library sections">
+          <a class="site-nav-link" href="/users/">Users</a>
+          <a class="site-nav-link" href="/books/">Books</a>
+          <a class="site-nav-link" href="/music/">Music</a>
+          <a class="site-nav-link" href="/movies/">Movies</a>
+          <div class="club-menu">
+            <a class="site-nav-link club-trigger" href="/essay-club/">Clubs</a>
+            <div class="club-menu-panel">
+              <a href="/essay-club/">Essay Club</a>
+              <a href="/book-club/">Book Club</a>
+            </div>
+          </div>
+        </nav>
+        <div class="theme-bar">
+          <button class="theme-toggle" type="button" data-theme-toggle>
+            Theme: Auto
+          </button>
+        </div>
       </header>
       <main>
         <slot />
       </main>
-      <footer class="site-footer">
-        <p>Built from <code>library.db</code>.</p>
-      </footer>
     </div>
+    <script is:inline>
+      const themeOrder = ["auto", "dark", "light"];
+      const themeNames = { auto: "Auto", dark: "Night", light: "Day" };
+      const root = document.documentElement;
+      const button = document.querySelector("[data-theme-toggle]");
+
+      function applyTheme(theme) {
+        if (theme === "light" || theme === "dark") {
+          root.dataset.theme = theme;
+          localStorage.setItem("theme-preference", theme);
+        } else {
+          root.dataset.theme = "auto";
+          localStorage.removeItem("theme-preference");
+        }
+
+        if (button) {
+          button.textContent = `Theme: ${themeNames[theme]}`;
+        }
+      }
+
+      const currentTheme = localStorage.getItem("theme-preference") || "auto";
+      applyTheme(currentTheme);
+
+      button?.addEventListener("click", () => {
+        const activeTheme = localStorage.getItem("theme-preference") || "auto";
+        const nextTheme = themeOrder[(themeOrder.indexOf(activeTheme) + 1) % themeOrder.length];
+        applyTheme(nextTheme);
+      });
+    </script>
   </body>
 </html>

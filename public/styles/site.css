@@ -4,6 +4,36 @@
   --muted: #64584f;
   --border: #b6a998;
   --accent: #7a2f24;
+  --panel: rgba(255, 255, 255, 0.45);
+  --panel-strong: rgba(255, 255, 255, 0.72);
+  --panel-soft: rgba(255, 255, 255, 0.4);
+  --shadow: rgba(31, 26, 23, 0.08);
+}
+
+html[data-theme="dark"] {
+  --paper: #161311;
+  --ink: #efe5d6;
+  --muted: #b9ab97;
+  --border: #5d4c40;
+  --accent: #e5a58b;
+  --panel: rgba(33, 27, 24, 0.82);
+  --panel-strong: rgba(48, 39, 35, 0.96);
+  --panel-soft: rgba(37, 31, 27, 0.78);
+  --shadow: rgba(0, 0, 0, 0.35);
+}
+
+@media (prefers-color-scheme: dark) {
+  html[data-theme="auto"] {
+    --paper: #161311;
+    --ink: #efe5d6;
+    --muted: #b9ab97;
+    --border: #5d4c40;
+    --accent: #e5a58b;
+    --panel: rgba(33, 27, 24, 0.82);
+    --panel-strong: rgba(48, 39, 35, 0.96);
+    --panel-soft: rgba(37, 31, 27, 0.78);
+    --shadow: rgba(0, 0, 0, 0.35);
+  }
 }
 
 html {
@@ -28,15 +58,15 @@ a {
 }
 
 .site-header,
-.site-footer,
 .intro,
 .stats-grid,
 .user-list li,
 .category,
 .meta-block,
-.user-heading {
+.user-heading,
+.essay-callout {
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.45);
+  background: var(--panel);
   padding: 1rem;
 }
 
@@ -45,8 +75,8 @@ a {
 .stats-grid,
 .meta-block,
 .user-heading,
-.category,
-.site-footer {
+.essay-callout,
+.category {
   margin-bottom: 1rem;
 }
 
@@ -69,6 +99,108 @@ a {
   margin: 0 0 0.5rem;
 }
 
+.site-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "eyebrow theme"
+    "title theme"
+    "nav nav";
+  column-gap: 1rem;
+  align-items: start;
+  background:
+    linear-gradient(to bottom, color-mix(in srgb, var(--panel-strong) 85%, transparent), var(--panel)),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 24px,
+      rgba(122, 47, 36, 0.04) 24px,
+      rgba(122, 47, 36, 0.04) 25px
+    );
+}
+
+.site-header .eyebrow {
+  grid-area: eyebrow;
+}
+
+.site-header h1 {
+  grid-area: title;
+}
+
+.site-nav {
+  grid-area: nav;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.9rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(122, 47, 36, 0.18);
+  align-items: center;
+}
+
+.site-nav-link,
+.club-menu-panel a {
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.site-nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.2rem;
+  padding: 0 0.7rem;
+  border: 1px solid transparent;
+  background: var(--panel-soft);
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.site-nav-link:hover,
+.site-nav-link:focus-visible,
+.club-menu:hover .club-trigger,
+.club-menu:focus-within .club-trigger {
+  background: var(--panel-strong);
+  border-color: rgba(122, 47, 36, 0.22);
+  outline: none;
+}
+
+.club-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding-bottom: 0.45rem;
+  margin-bottom: -0.45rem;
+}
+
+.club-trigger::after {
+  content: "▾";
+  margin-left: 0.45rem;
+  font-size: 0.8rem;
+}
+
+.club-menu-panel {
+  position: absolute;
+  top: calc(100% - 0.05rem);
+  left: 0;
+  min-width: 9rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--border);
+  background: var(--paper);
+  display: none;
+  gap: 0.35rem;
+  z-index: 2;
+  box-shadow: 0 8px 20px var(--shadow);
+}
+
+.club-menu-panel a {
+  white-space: nowrap;
+  padding: 0.25rem 0;
+}
+
+.club-menu:hover .club-menu-panel,
+.club-menu:focus-within .club-menu-panel {
+  display: grid;
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -78,6 +210,7 @@ a {
 .stats-grid article {
   border: 1px solid var(--border);
   padding: 0.75rem;
+  background: var(--panel-soft);
 }
 
 .stats-grid h3,
@@ -102,6 +235,119 @@ a {
   margin-bottom: 0.75rem;
 }
 
+.category > h2,
+.category > h3,
+.essay-callout h2 {
+  margin-top: 0;
+}
+
+.essay-callout {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--panel-strong) 82%, transparent), var(--panel)),
+    var(--panel);
+}
+
+.media-card {
+  display: grid;
+  grid-template-columns: minmax(92px, 140px) 1fr;
+  gap: 0.9rem;
+  align-items: start;
+}
+
+.media-art {
+  width: 92px;
+  height: 138px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  background: var(--panel-strong);
+}
+
+.media-art-wide {
+  width: 140px;
+  height: 92px;
+}
+
+.media-art-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-align: center;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+.poster-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.5rem;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.shelf-search {
+  margin-bottom: 1rem;
+}
+
+.search-label {
+  display: block;
+}
+
+.search-label span {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.search-label input {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--border);
+  background: var(--panel-strong);
+  color: var(--ink);
+  font: inherit;
+  box-sizing: border-box;
+}
+
+.theme-bar {
+  grid-area: theme;
+  justify-self: end;
+  align-self: start;
+  margin-top: 0;
+}
+
+.theme-toggle {
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+  background: var(--panel-strong);
+  outline: none;
+}
+
+.search-label input:focus {
+  outline: 2px solid rgba(122, 47, 36, 0.22);
+  border-color: var(--accent);
+}
+
+.poster-label {
+  color: var(--muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 .user-list li:last-child,
 .media-list li:last-child {
   margin-bottom: 0;
@@ -109,4 +355,35 @@ a {
 
 code {
   font-family: "Courier New", Courier, monospace;
+}
+
+@media (max-width: 560px) {
+  .site-header {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "eyebrow"
+      "title"
+      "theme"
+      "nav";
+  }
+
+  .media-card {
+    grid-template-columns: 1fr;
+  }
+
+  .site-nav {
+    gap: 0.5rem 0.9rem;
+  }
+
+  .club-menu-panel {
+    position: static;
+    margin-top: 0.4rem;
+    display: grid;
+    box-shadow: none;
+  }
+
+  .theme-bar {
+    justify-self: start;
+    margin-top: 0.4rem;
+  }
 }

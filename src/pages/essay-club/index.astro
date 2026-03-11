@@ -1,0 +1,58 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SearchableShelf from "../../components/SearchableShelf.svelte";
+
+const essays = [
+  {
+    title: "Why libraries matter on the internet",
+    subtitle: "Starter topic",
+    meta: "Essay Club note",
+    href: "#",
+    placeholderLabel: "Essay",
+    kindLabel: "Essay"
+  },
+  {
+    title: "What makes a good recommendation archive",
+    subtitle: "Prompt for discussion",
+    meta: "Essay Club note",
+    href: "#",
+    placeholderLabel: "Essay",
+    kindLabel: "Essay"
+  },
+  {
+    title: "Notes on keeping taste public",
+    subtitle: "Reading-room draft",
+    meta: "Essay Club note",
+    href: "#",
+    placeholderLabel: "Essay",
+    kindLabel: "Essay"
+  }
+];
+---
+
+<BaseLayout title="Essay Club | Server Library">
+  <section class="user-heading">
+    <p><a href="/">Back to index</a></p>
+    <h2>Essay Club</h2>
+    <p class="meta">A quieter shelf for essays, prompts, and reading notes.</p>
+  </section>
+
+  <section class="essay-callout">
+    <div>
+      <p>
+        This room can stay lightweight for now: a place for longer writing that sits beside the
+        main library without turning into a blog engine yet.
+      </p>
+    </div>
+  </section>
+
+  <section class="category">
+    <SearchableShelf
+      client:load
+      items={essays}
+      placeholder="Search Essay Club"
+      searchLabel="Search essays"
+      emptyMessage="No essays added yet."
+    />
+  </section>
+</BaseLayout>
