@@ -1,5 +1,6 @@
 ---
 const { title = "Server Library", description = "Static library generated from SQLite." } = Astro.props;
+import { withBase } from "../lib/paths.js";
 ---
 
 <!doctype html>
@@ -17,24 +18,24 @@ const { title = "Server Library", description = "Static library generated from S
         document.documentElement.dataset.theme = "auto";
       }
     </script>
-    <link rel="stylesheet" href="/styles/site.css" />
+    <link rel="stylesheet" href={withBase("/styles/site.css")} />
   </head>
   <body>
     <div class="page-shell">
       <header class="site-header">
         <p class="eyebrow">server-library</p>
-        <h1><a href="/">The Library</a></h1>
+        <h1><a href={withBase("/")}>The Library</a></h1>
         <nav class="site-nav" aria-label="Library sections">
-          <a class="site-nav-link" href="/users/">Users</a>
-          <a class="site-nav-link" href="/books/">Books</a>
-          <a class="site-nav-link" href="/music/">Music</a>
-          <a class="site-nav-link" href="/movies/">Movies</a>
-          <a class="site-nav-link" href="/big-graph/">The big graph</a>
+          <a class="site-nav-link" href={withBase("/users/")}>Users</a>
+          <a class="site-nav-link" href={withBase("/books/")}>Books</a>
+          <a class="site-nav-link" href={withBase("/music/")}>Music</a>
+          <a class="site-nav-link" href={withBase("/movies/")}>Movies</a>
+          <a class="site-nav-link" href={withBase("/big-graph/")}>The big graph</a>
           <div class="club-menu">
-            <a class="site-nav-link club-trigger" href="/essay-club/">Clubs</a>
+            <a class="site-nav-link club-trigger" href={withBase("/essay-club/")}>Clubs</a>
             <div class="club-menu-panel">
-              <a href="/essay-club/">Essay Club</a>
-              <a href="/book-club/">Book Club</a>
+              <a href={withBase("/essay-club/")}>Essay Club</a>
+              <a href={withBase("/book-club/")}>Book Club</a>
             </div>
           </div>
         </nav>

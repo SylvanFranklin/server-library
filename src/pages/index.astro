@@ -2,6 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import SearchableShelf from "../components/SearchableShelf.svelte";
 import library from "../data/library.js";
+import { withBase } from "../lib/paths.js";
 
 const bookPicks = library.users.flatMap((user) =>
   user.books.map((book) => ({
@@ -39,7 +40,7 @@ const newStuff = library.users
       addedAt: book.added_at,
       username: user.username,
       meta: `Added by ${user.username} on ${book.added_at}`,
-      href: `/users/${user.username}/`,
+      href: withBase(`/users/${user.username}/`),
       placeholderLabel: "No cover",
       kindLabel: "Book",
       avatarText: user.username.slice(0, 1).toUpperCase()
@@ -53,7 +54,7 @@ const newStuff = library.users
       addedAt: artist.added_at,
       username: user.username,
       meta: `Added by ${user.username} on ${artist.added_at}`,
-      href: `/users/${user.username}/`,
+      href: withBase(`/users/${user.username}/`),
       placeholderLabel: "No image",
       kindLabel: "Music",
       avatarText: user.username.slice(0, 1).toUpperCase()
@@ -68,7 +69,7 @@ const newStuff = library.users
       addedAt: movie.added_at,
       username: user.username,
       meta: `Added by ${user.username} on ${movie.added_at}`,
-      href: `/users/${user.username}/`,
+      href: withBase(`/users/${user.username}/`),
       kindLabel: "Movie",
       avatarText: user.username.slice(0, 1).toUpperCase()
     }))
@@ -88,19 +89,19 @@ const newStuff = library.users
 
   <section class="stats-grid">
     <article>
-      <h3><a href="/users/">Users</a></h3>
+      <h3><a href={withBase("/users/")}>Users</a></h3>
       <p>{library.totals.users}</p>
     </article>
     <article>
-      <h3><a href="/books/">Books</a></h3>
+      <h3><a href={withBase("/books/")}>Books</a></h3>
       <p>{library.totals.books}</p>
     </article>
     <article>
-      <h3><a href="/music/">Music</a></h3>
+      <h3><a href={withBase("/music/")}>Music</a></h3>
       <p>{library.totals.music}</p>
     </article>
     <article>
-      <h3><a href="/movies/">Movies</a></h3>
+      <h3><a href={withBase("/movies/")}>Movies</a></h3>
       <p>{library.totals.movies}</p>
     </article>
   </section>

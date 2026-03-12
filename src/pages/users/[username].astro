@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import library from "../../data/library.js";
+import { withBase } from "../../lib/paths.js";
 
 export function getStaticPaths() {
   return library.users.map((user) => ({
@@ -14,7 +15,7 @@ const { user } = Astro.props;
 
 <BaseLayout title={`${user.username} | Server Library`}>
   <section class="user-heading">
-    <p><a href="/">Back to index</a></p>
+    <p><a href={withBase("/")}>Back to index</a></p>
     <h2>{user.username}</h2>
     <p class="meta">
       {user.counts.books} books, {user.counts.music} artists, {user.counts.movies} movies
@@ -22,7 +23,7 @@ const { user } = Astro.props;
   </section>
 
   <section class="category">
-    <h3><a href="/books/">Books</a></h3>
+    <h3><a href={withBase("/books/")}>Books</a></h3>
     {user.books.length ? (
       <ul class="media-list">
         {user.books.map((book) => (
@@ -52,7 +53,7 @@ const { user } = Astro.props;
   </section>
 
   <section class="category">
-    <h3><a href="/music/">Music</a></h3>
+    <h3><a href={withBase("/music/")}>Music</a></h3>
     {user.music.length ? (
       <ul class="media-list">
         {user.music.map((artist) => (
@@ -84,7 +85,7 @@ const { user } = Astro.props;
   </section>
 
   <section class="category">
-    <h3><a href="/movies/">Movies</a></h3>
+    <h3><a href={withBase("/movies/")}>Movies</a></h3>
     {user.movies.length ? (
       <ul class="media-list">
         {user.movies.map((movie) => (

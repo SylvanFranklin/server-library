@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import SearchableShelf from "../../components/SearchableShelf.svelte";
 import library from "../../data/library.js";
+import { withBase } from "../../lib/paths.js";
 
 const movies = library.users.flatMap((user) =>
   user.movies.map((movie) => ({
@@ -11,7 +12,7 @@ const movies = library.users.flatMap((user) =>
     imageAlt: `Poster for ${movie.title}`,
     meta: `Saved by ${user.username} on ${movie.added_at}`,
     username: user.username,
-    href: `/users/${user.username}/`,
+    href: withBase(`/users/${user.username}/`),
     isPosterFallback: true,
     posterText: movie.year ? `(${movie.year})` : "",
     kindLabel: "Movie"
@@ -21,7 +22,7 @@ const movies = library.users.flatMap((user) =>
 
 <BaseLayout title="Movies | Server Library">
   <section class="user-heading">
-    <p><a href="/">Back to index</a></p>
+    <p><a href={withBase("/")}>Back to index</a></p>
     <h2>Movies</h2>
     <p class="meta">{movies.length} movies in this snapshot</p>
   </section>

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import SearchableShelf from "../../components/SearchableShelf.svelte";
+import { withBase } from "../../lib/paths.js";
 
 const books = [
   {
@@ -32,7 +33,7 @@ const books = [
 
 <BaseLayout title="Book Club | Server Library">
   <section class="user-heading">
-    <p><a href="/">Back to index</a></p>
+    <p><a href={withBase("/")}>Back to index</a></p>
     <h2>Book Club</h2>
     <p class="meta">A shelf for shared reads, shortlist ideas, and discussion picks.</p>
   </section>
