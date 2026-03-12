@@ -1,168 +1,22 @@
-"""Book title extractor using chatjimmy API + Open Library pipeline.
+"""Book title extractor using local Ollama LLM + Open Library pipeline.
 
-Uses the free chatjimmy.ai API to extract book titles from raw text,
+Uses a local Ollama model to extract book titles from raw text,
 then fetches search results for each title from Open Library.
+
+BACKWARD COMPATIBLE: All original function signatures preserved.
 """
 
-import gzip
-import json
-import re
-import sys
-import urllib.error
-import urllib.request
-
-from openlibrary import SearchResult, search_books
+from openlibrary import search_books
+from base_extractor import create_extractor
+from local_llm_client import BOOK_PROMPT_TEMPLATE
 
 
-API_URL = "https://chatjimmy.ai/api/chat"
-MODEL = "llama3.1-8B"
-
-HEADERS = {
-    "Accept": "*/*",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Accept-Encoding": "gzip, deflate",
-    "Content-Type": "application/json",
-    "Origin": "https://chatjimmy.ai",
-    "Referer": "https://chatjimmy.ai/",
-    "DNT": "1",
-    "Connection": "keep-alive",
-    "Sec-Fetch-Dest": "empty",
-    "Sec-Fetch-Mode": "cors",
-    "Sec-Fetch-Site": "same-origin",
-}
-
-STATS_RE = re.compile(r"<\|stats\|>.*?<\|/stats\|>", re.DOTALL)
-
-_PROMPT_TEMPLATE = """\
-Extract all book titles mentioned in the following text.
-Return ONLY a valid JSON array of book title strings, with no additional commentary or explanation.
-If no book titles are mentioned, return an empty JSON array: []
-
-Example format:
-["The Great Gatsby", "1984", "To Kill a Mockingbird"]
-
-Text: {text}"""
+# Create the extractor functions using the factory pattern
+extract_book_titles, get_recommendations_for_text = create_extractor(
+    BOOK_PROMPT_TEMPLATE,
+    search_books,
+)
 
 
-def _call_api(message: str) -> str | None:
-    """Call the chatjimmy API and return the parsed response.
-
-    Args:
-        message: The message to send to the API.
-
-    Returns:
-        Parsed response text, or None if the request fails.
-    """
-    payload = json.dumps(
-        {
-            "messages": [{"role": "user", "content": message}],
-            "chatOptions": {
-                "selectedModel": MODEL,
-                "systemPrompt": "",
-                "topK": 8,
-            },
-            "attachment": None,
-        }
-    ).encode()
-
-    req = urllib.request.Request(API_URL, data=payload, headers=HEADERS, method="POST")
-
-    try:
-        with urllib.request.urlopen(req) as resp:
-            raw = resp.read()
-            if resp.getheader("Content-Encoding") == "gzip":
-                raw = gzip.decompress(raw)
-            return _parse_response(raw.decode())
-    except urllib.error.HTTPError as e:
-        body = e.read()
-        if e.headers.get("Content-Encoding") == "gzip":
-            body = gzip.decompress(body)
-        print(f"[http {e.code}] {body.decode()}", file=sys.stderr)
-    except urllib.error.URLError as e:
-        print(f"[network error] {e.reason}", file=sys.stderr)
-
-    return None
-
-
-def _parse_response(raw: str) -> str:
-    """Extract clean text from a streamed API response.
-
-    Args:
-        raw: The raw response string from the API.
-
-    Returns:
-        Cleaned response text.
-    """
-    parts = []
-    for line in raw.splitlines():
-        line = line.strip()
-        if line.startswith("0:"):
-            try:
-                parts.append(json.loads(line[2:]))
-            except json.JSONDecodeError:
-                pass
-
-    text = "".join(parts) if parts else raw
-    return STATS_RE.sub("", text).strip()
-
-
-def extract_book_titles(text: str) -> list[str]:
-    """Extract book titles from raw text using chatjimmy API.
-
-    Args:
-        text: Raw text that may contain book title mentions.
-
-    Returns:
-        List of book title strings found in the text.
-
-    Raises:
-        json.JSONDecodeError: If the model output is not valid JSON.
-        RuntimeError: If the API call fails.
-    """
-    response = _call_api(_PROMPT_TEMPLATE.format(text=text))
-
-    if response is None:
-        raise RuntimeError("Failed to call chatjimmy API")
-
-    clean = response.strip()
-
-    # Strip markdown code blocks if present (```json ... ```)
-    clean = re.sub(r"^```(?:json)?\n?", "", clean)
-    clean = re.sub(r"\n?```$", "", clean)
-    clean = clean.strip()
-
-    # Handle empty response
-    if not clean:
-        return []
-
-    # Parse JSON array
-    titles = json.loads(clean)
-
-    # Ensure it's a list and all items are strings
-    if not isinstance(titles, list):
-        raise ValueError(f"Expected JSON array, got {type(titles)}")
-
-    return [str(title).strip() for title in titles if title]
-
-
-def get_recommendations_for_text(text: str) -> dict[str, SearchResult]:
-    """Extract book titles from text and fetch Open Library results for each.
-
-    Args:
-        text: Raw text that may contain book title mentions.
-
-    Returns:
-        Dict mapping each extracted book title to its Open Library SearchResult.
-        Titles with no results are included with an empty SearchResult.
-
-    Raises:
-        json.JSONDecodeError: If the model output is not valid JSON.
-        RuntimeError: If the API call fails.
-    """
-    titles = extract_book_titles(text)
-
-    results: dict[str, SearchResult] = {}
-    for title in titles:
-        results[title] = search_books(title)
-
-    return results
+# Explicit exports for backward compatibility
+__all__ = ["extract_book_titles", "get_recommendations_for_text"]

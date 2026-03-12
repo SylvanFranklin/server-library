@@ -3,10 +3,17 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "setup": "./scripts/setup.sh frontend",
     "build:data": "uv run python export_site_data.py",
     "build": "npm run build:data && astro build",
+    "build:all": "./scripts/build.sh all --prod",
+    "build:frontend": "./scripts/build.sh frontend --prod",
+    "build:backend": "./scripts/build.sh backend",
     "dev": "npm run build:data && astro dev",
-    "preview": "astro preview"
+    "dev:frontend": "./scripts/dev.sh frontend",
+    "dev:backend": "./scripts/dev.sh backend",
+    "preview": "astro preview",
+    "db:init": "./scripts/db-init.sh"
   },
   "devDependencies": {
     "astro": "^5.13.5"
