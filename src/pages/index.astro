@@ -3,6 +3,32 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import SearchableShelf from "../components/SearchableShelf.svelte";
 import library from "../data/library.js";
 
+const bookPicks = library.users.flatMap((user) =>
+  user.books.map((book) => ({
+    title: book.title,
+    imageUrl: book.cover_url,
+    imageAlt: `Cover of ${book.title}`
+  }))
+);
+
+const musicPicks = library.users.flatMap((user) =>
+  user.music.map((artist) => ({
+    title: artist.name,
+    imageUrl: artist.image_url,
+    imageAlt: `Artist image for ${artist.name}`,
+    wide: true
+  }))
+);
+
+const moviePicks = library.users.flatMap((user) =>
+  user.movies.map((movie) => ({
+    title: movie.title,
+    imageUrl: movie.poster_url,
+    imageAlt: `Poster for ${movie.title}`,
+    year: movie.year
+  }))
+);
+
 const newStuff = library.users
   .flatMap((user) => [
     ...user.books.map((book) => ({
@@ -15,7 +41,8 @@ const newStuff = library.users
       meta: `Added by ${user.username} on ${book.added_at}`,
       href: `/users/${user.username}/`,
       placeholderLabel: "No cover",
-      kindLabel: "Book"
+      kindLabel: "Book",
+      avatarText: user.username.slice(0, 1).toUpperCase()
     })),
     ...user.music.map((artist) => ({
       title: artist.name,
@@ -28,7 +55,8 @@ const newStuff = library.users
       meta: `Added by ${user.username} on ${artist.added_at}`,
       href: `/users/${user.username}/`,
       placeholderLabel: "No image",
-      kindLabel: "Music"
+      kindLabel: "Music",
+      avatarText: user.username.slice(0, 1).toUpperCase()
     })),
     ...user.movies.map((movie) => ({
       title: movie.title,
@@ -41,13 +69,22 @@ const newStuff = library.users
       username: user.username,
       meta: `Added by ${user.username} on ${movie.added_at}`,
       href: `/users/${user.username}/`,
-      kindLabel: "Movie"
+      kindLabel: "Movie",
+      avatarText: user.username.slice(0, 1).toUpperCase()
     }))
   ])
   .sort((a, b) => b.addedAt.localeCompare(a.addedAt));
 ---
 
 <BaseLayout title="Server Library">
+  <section class="category">
+    <h2>About this library</h2>
+    <p>
+      Add a short description of the website here. This can explain what the library is for, how it
+      is built, or what people should expect to find in it.
+    </p>
+  </section>
+
   <section class="stats-grid">
     <article>
       <h3><a href="/users/">Users</a></h3>
@@ -68,14 +105,106 @@ const newStuff = library.users
   </section>
 
   <section class="category">
-    <h2>New stuff</h2>
+    <h2>Shelves</h2>
+
+    <div class="scroll-shelf">
+      <div class="shelf-head">
+        <p class="eyebrow">Books</p>
+        <div class="shelf-controls">
+          <button class="shelf-button" type="button" data-shelf-prev="books" aria-label="Scroll books left">←</button>
+          <button class="shelf-button" type="button" data-shelf-next="books" aria-label="Scroll books right">→</button>
+        </div>
+      </div>
+      <div class="scroll-window" data-shelf="books">
+        <div class="scroll-track">
+          {bookPicks.map((book) => (
+            <div class="scroll-card">
+              {book.imageUrl ? (
+                <img class="scroll-art" src={book.imageUrl} alt={book.imageAlt} loading="lazy" />
+              ) : (
+                <div class="scroll-art scroll-art-placeholder" aria-hidden="true">Book</div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-shelf">
+      <div class="shelf-head">
+        <p class="eyebrow">Movies</p>
+        <div class="shelf-controls">
+          <button class="shelf-button" type="button" data-shelf-prev="movies" aria-label="Scroll movies left">←</button>
+          <button class="shelf-button" type="button" data-shelf-next="movies" aria-label="Scroll movies right">→</button>
+        </div>
+      </div>
+      <div class="scroll-window" data-shelf="movies">
+        <div class="scroll-track">
+          {moviePicks.map((movie) => (
+            <div class="scroll-card">
+              {movie.imageUrl && !movie.imageUrl.startsWith("data:image/svg+xml") ? (
+                <img class="scroll-art" src={movie.imageUrl} alt={movie.imageAlt} loading="lazy" />
+              ) : (
+                <div class="scroll-art scroll-art-placeholder" aria-hidden="true">
+                  {movie.title}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-shelf">
+      <div class="shelf-head">
+        <p class="eyebrow">Music</p>
+        <div class="shelf-controls">
+          <button class="shelf-button" type="button" data-shelf-prev="music" aria-label="Scroll music left">←</button>
+          <button class="shelf-button" type="button" data-shelf-next="music" aria-label="Scroll music right">→</button>
+        </div>
+      </div>
+      <div class="scroll-window" data-shelf="music">
+        <div class="scroll-track">
+          {musicPicks.map((artist) => (
+            <div class="scroll-card scroll-card-wide">
+              {artist.imageUrl ? (
+                <img class="scroll-art scroll-art-wide" src={artist.imageUrl} alt={artist.imageAlt} loading="lazy" />
+              ) : (
+                <div class="scroll-art scroll-art-wide scroll-art-placeholder" aria-hidden="true">
+                  {artist.title}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="category">
+    <h2>Recently added</h2>
     <SearchableShelf
       client:load
       items={newStuff}
       placeholder="Search recent additions"
-      searchLabel="Search new stuff"
+      searchLabel="Search recently added"
       emptyMessage="No saved items are stored in the database yet."
     />
   </section>
 
 </BaseLayout>
+
+<script is:inline>
+  const shelfStep = 320;
+
+  for (const button of document.querySelectorAll("[data-shelf-prev], [data-shelf-next]")) {
+    button.addEventListener("click", () => {
+      const name = button.getAttribute("data-shelf-prev") || button.getAttribute("data-shelf-next");
+      const shelf = document.querySelector(`[data-shelf="${name}"]`);
+      if (!shelf) return;
+
+      const direction = button.hasAttribute("data-shelf-prev") ? -1 : 1;
+      shelf.scrollBy({ left: direction * shelfStep, behavior: "smooth" });
+    });
+  }
+</script>

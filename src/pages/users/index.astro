@@ -8,7 +8,8 @@ const users = library.users.map((user) => ({
   subtitle: `${user.counts.books} books, ${user.counts.music} artists, ${user.counts.movies} movies`,
   meta: `Added to library on ${user.created_at}`,
   href: `/users/${user.username}/`,
-  placeholderLabel: "User",
+  isAvatar: true,
+  avatarText: user.username.slice(0, 1).toUpperCase(),
   kindLabel: "User",
   username: user.username
 }));
