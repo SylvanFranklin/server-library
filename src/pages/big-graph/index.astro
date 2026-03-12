@@ -1,11 +1,12 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { withBase } from "../../lib/paths.js";
 
 ---
 
 <BaseLayout title="The big graph | Server Library">
   <section class="user-heading">
-    <p><a href="/">Back to index</a></p>
+    <p><a href={withBase("/")}>Back to index</a></p>
     <h2>The big graph</h2>
     <p class="meta">A future map of shared taste.</p>
   </section>

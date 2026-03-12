@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import SearchableShelf from "../../components/SearchableShelf.svelte";
 import library from "../../data/library.js";
+import { withBase } from "../../lib/paths.js";
 
 const artists = library.users.flatMap((user) =>
   user.music.map((artist) => ({
@@ -11,7 +12,7 @@ const artists = library.users.flatMap((user) =>
     imageAlt: `Artist image for ${artist.name}`,
     meta: `Saved by ${user.username} on ${artist.added_at}`,
     username: user.username,
-    href: `/users/${user.username}/`,
+    href: withBase(`/users/${user.username}/`),
     wide: true,
     placeholderLabel: "No image",
     kindLabel: "Music"
@@ -21,7 +22,7 @@ const artists = library.users.flatMap((user) =>
 
 <BaseLayout title="Music | Server Library">
   <section class="user-heading">
-    <p><a href="/">Back to index</a></p>
+    <p><a href={withBase("/")}>Back to index</a></p>
     <h2>Music</h2>
     <p class="meta">{artists.length} artists in this snapshot</p>
   </section>
