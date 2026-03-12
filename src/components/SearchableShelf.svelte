@@ -36,7 +36,11 @@
   <ul class="media-list">
     {#each filteredItems as item}
       <li class="media-card">
-        {#if item.imageUrl && !(item.isPosterFallback && item.imageUrl.startsWith("data:image/svg+xml"))}
+        {#if item.isAvatar}
+          <div class="media-art avatar-placeholder" aria-hidden="true">
+            <span>{item.avatarText || "U"}</span>
+          </div>
+        {:else if item.imageUrl && !(item.isPosterFallback && item.imageUrl.startsWith("data:image/svg+xml"))}
           <img
             class={`media-art ${item.wide ? "media-art-wide" : ""}`}
             src={item.imageUrl}
